@@ -1,16 +1,22 @@
 body {
   font-family: Arial, sans-serif;
   padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
 
 .channel {
   border: 1px solid #ccc;
+  background-color: lightgray;
   padding: 10px;
-  margin: 10px 0;
+  margin: 50px;
   width: 400px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 150px;
 }
 
 .channel h2 {
@@ -35,6 +41,10 @@ input[type="range"] {
   direction: rtl;
   vertical-align: middle;
   height: 400px;
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
 }
 
 .gain {

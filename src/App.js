@@ -95,7 +95,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         }}
       />
       <button onClick={playSample}>Play</button>
-      <button onClick={pauseSample}>Pause</button>
+      <button onClick={pauseSample}>Stop</button>
       <label>
         <input
           type="checkbox"
