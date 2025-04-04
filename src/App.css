@@ -12,14 +12,14 @@ body {
 
 .channel {
   border: 1px solid #ccc;
+  border-radius: 10px;
   background-color: lightgray;
   padding: 10px;
-  margin: 50px;
-  width: 400px;
+  margin: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 300px;
+  width: 200px;
 }
 
 .channel h2 {
@@ -63,9 +63,17 @@ input[type="checkbox"] {
     margin-right: 8px;
   }
   input {
-    height: 100px;
+    height: 50px;
   }
-  h4 {
-    width: 100%;;
-  }
+}
+
+.stopButton {
+  background-color: lightsalmon;
+  width: 90px;
+  padding: 5px;
+}
+.playButton {
+  background-color: lightgreen;
+  width: 90px;
+  padding: 5px;
 }

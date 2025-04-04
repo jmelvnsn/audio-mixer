@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import playButton from './images/play1.png';
+import stopButton from './images/stop1.png';
 import './App.css';
 
 
@@ -161,8 +163,10 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
           }
         }}
       />
-      <button onClick={playSample}>Play</button>
-      <button onClick={pauseSample}>Stop</button>
+       <div className="playControl">
+        <img  src={playButton} className="playButton" alt="play button" onClick={playSample} />
+        <img  src={stopButton} className="stopButton" alt="stop button" onClick={pauseSample} />
+      </div>
       <label>
         <input
           type="checkbox"
