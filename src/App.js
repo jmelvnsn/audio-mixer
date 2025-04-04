@@ -8,20 +8,70 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
   const [startTime, setStartTime] = useState(0);
   const [pauseTime, setPauseTime] = useState(0);
   const [loop, setLoop] = useState(false);
+  
+  // New state for the reverb mix slider: 0 = 100% dry, 1 = 100% wet.
+  // Defaulting to 0.3 (i.e. 70% dry, 30% wet).
+  const [mix, setMix] = useState(0.3);
 
-  // Create a gain node for this channel
+  // Create a gain node for channel volume (before effect splitting)
   const gainNode = useRef(audioCtx.createGain());
+  // Create nodes for the reverb effect chain
+  const dryGainNode = useRef(audioCtx.createGain());
+  const wetGainNode = useRef(audioCtx.createGain());
+  const convolver = useRef(audioCtx.createConvolver());
 
-  // On mount, connect the gain node to the destination and set initial gain
+  // Helper function to create an impulse response for the convolver
+  function createImpulseResponse(duration = 3, decay = 2, reverse = false) {
+    const sampleRate = audioCtx.sampleRate;
+    const length = sampleRate * duration;
+    const impulse = audioCtx.createBuffer(2, length, sampleRate);
+    for (let channel = 0; channel < impulse.numberOfChannels; channel++) {
+      const impulseChannel = impulse.getChannelData(channel);
+      for (let i = 0; i < length; i++) {
+        const n = reverse ? length - i : i;
+        impulseChannel[i] = (Math.random() * 2 - 1) * Math.pow(1 - n / length, decay);
+      }
+    }
+    return impulse;
+  }
+
+  // On mount: set up the reverb chain and initialize gains based on the mix value.
   useEffect(() => {
-    gainNode.current.connect(audioCtx.destination);
+    // Set the channel volume gain
     gainNode.current.gain.value = gain;
-  }, [audioCtx, gain]);
+    // Set impulse response for the convolver
+    convolver.current.buffer = createImpulseResponse(3, 2, false);
+    // Initialize dry and wet gains based on the mix slider:
+    // mix = 0 => dry 1, wet 0; mix = 1 => dry 0, wet 1.
+    dryGainNode.current.gain.value = 1 - mix;
+    wetGainNode.current.gain.value = mix;
 
-  // Update the gain node if the gain prop changes
+    // Set up the audio routing:
+    // Source -> gainNode -> splits into two branches:
+    //   Dry: gainNode -> dryGainNode -> destination
+    //   Wet: gainNode -> convolver -> wetGainNode -> destination
+    try {
+      gainNode.current.disconnect();
+    } catch (e) {
+      console.error(e);
+    }
+    gainNode.current.connect(dryGainNode.current);
+    gainNode.current.connect(convolver.current);
+    dryGainNode.current.connect(audioCtx.destination);
+    convolver.current.connect(wetGainNode.current);
+    wetGainNode.current.connect(audioCtx.destination);
+  }, [audioCtx]);
+
+  // Update the main channel gain if the prop changes.
   useEffect(() => {
     gainNode.current.gain.value = gain;
   }, [gain]);
+
+  // Update the reverb mix whenever the mix state changes.
+  useEffect(() => {
+    dryGainNode.current.gain.value = 1 - mix;
+    wetGainNode.current.gain.value = mix;
+  }, [mix]);
 
   // Load an audio sample from a file
   const loadSample = (file) => {
@@ -55,6 +105,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     const newSource = audioCtx.createBufferSource();
     newSource.buffer = buffer;
     newSource.loop = loop;
+    // Connect the source to the channel gain node (which splits into dry/wet)
     newSource.connect(gainNode.current);
     const offset = pauseTime || 0;
     newSource.start(0, offset);
@@ -110,6 +161,21 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         Loop
       </label>
       <br />
+      {/* Combined reverb mix slider: horizontal, with "Dry" label on the left and "Wet" on the right */}
+      <div className="reverbSlider">
+        <span>Dry</span>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={mix}
+          onChange={(e) => setMix(parseFloat(e.target.value))}
+          style={{ flexGrow: 1 }}
+        />
+        <span style={{ marginLeft: '8px' }}>Wet</span>
+      </div>
+      {/* Vertical gain slider for channel volume */}
       <label className="gain">
         <input
           type="range"
@@ -118,6 +184,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
           step="0.01"
           value={gain}
           onChange={(e) => onGainChange(index, parseFloat(e.target.value))}
+          style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
         />
       </label>
     </div>

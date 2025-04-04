@@ -16,7 +16,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 150px;
+  width: 300px;
 }
 
 .channel h2 {
@@ -37,8 +37,6 @@ input {
 }
 
 input[type="range"] {
-  writing-mode: vertical-lr;
-  direction: rtl;
   vertical-align: middle;
   height: 400px;
 }
@@ -49,4 +47,22 @@ input[type="checkbox"] {
 
 .gain {
   align-self: center;
+}
+
+.reverbSlider {
+  display: flex;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  align-items: center;
+  flex-direction: row;; 
+  margin-bottom: 8px;
+  span {
+    margin-right: 8px;
+  }
+  input {
+    height: 100px;
+  }
+  h4 {
+    width: 100%;;
+  }
 }
