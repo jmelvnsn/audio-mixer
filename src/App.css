@@ -1,10 +1,13 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: monospace;
   padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
+  p {
+    margin: 0 50px;
+  }
 }
 
 .channel {

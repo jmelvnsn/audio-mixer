@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 
+
 function Channel({ index, gain, onGainChange, audioCtx }) {
   const [buffer, setBuffer] = useState(null);
   const [source, setSource] = useState(null);
@@ -34,6 +35,21 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     }
     return impulse;
   }
+
+
+  // Pre-load audio sample for Channel 1 from the public directory
+  useEffect(() => {
+    if (index === 0) {
+      fetch('https://jmelvnsn.github.io/audio-mixer/acoustic_guitar.wav')
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+        .then(decodedData => {
+          setBuffer(decodedData);
+          console.log(`Pre-loaded sample for channel ${index + 1}`);
+        })
+        .catch(error => console.error('Error pre-loading sample:', error));
+    }
+  }, [audioCtx, index]);
 
   // On mount: set up the reverb chain and initialize gains based on the mix value.
   useEffect(() => {
@@ -73,7 +89,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     wetGainNode.current.gain.value = mix;
   }, [mix]);
 
-  // Load an audio sample from a file
+  // Load an audio sample from a file (triggered by file input)
   const loadSample = (file) => {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -242,6 +258,7 @@ function App() {
 
   return (
     <div className="App">
+      <p>Channel 1 is preloaded with an acoustic guitar. <br/>You can demo by pressing play and/or selecting loop.<br/> Feel free to load your own samples.</p>
       <div id="channels" style={{ display: "flex" }}>
         {gains.map((gain, index) => (
           <Channel
