@@ -164,8 +164,8 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         }}
       />
        <div className="playControl">
-        <img  src={playButton} className="playButton" alt="play button" onClick={playSample} />
-        <img  src={stopButton} className="stopButton" alt="stop button" onClick={pauseSample} />
+        <img src={playButton} className="playButton" alt="play button" onClick={playSample} />
+        <img src={stopButton} className="stopButton" alt="stop button" onClick={pauseSample} />
       </div>
       <label>
         <input

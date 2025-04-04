@@ -20,6 +20,7 @@ body {
   flex-direction: column;
   justify-content: center;
   width: 200px;
+  text-align: center;
 }
 
 .channel h2 {
