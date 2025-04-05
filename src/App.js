@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import playButton from './images/play1.png';
-import stopButton from './images/stop1.png';
 import './App.css';
 
 
@@ -164,8 +162,8 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         }}
       />
        <div className="playControl">
-        <img src={playButton} className="playButton" alt="play button" onClick={playSample} />
-        <img src={stopButton} className="stopButton" alt="stop button" onClick={pauseSample} />
+        <button type="button" onClick={playSample}>PLAY</button>
+        <button type="button" onClick={pauseSample}>STOP</button>
       </div>
       <label>
         <input
@@ -262,7 +260,6 @@ function App() {
 
   return (
     <div className="App">
-      <p>Channel 1 is preloaded with an acoustic guitar. <br/>You can demo by pressing play and/or selecting loop.<br/> Feel free to load your own samples.</p>
       <div id="channels" style={{ display: "flex" }}>
         {gains.map((gain, index) => (
           <Channel
