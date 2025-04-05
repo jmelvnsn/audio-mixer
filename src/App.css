@@ -12,11 +12,10 @@ body {
 
 .channel {
   border: 1px solid #ccc;
-  border-radius: 10px;
   background-color: lightgray;
   padding: 10px;
-  margin: 40px;
   display: flex;
+  height: 100%;
   flex-direction: column;
   justify-content: center;
   width: 200px;
