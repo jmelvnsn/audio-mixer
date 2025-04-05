@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 
-
 function Channel({ index, gain, onGainChange, audioCtx }) {
   const [buffer, setBuffer] = useState(null);
   const [source, setSource] = useState(null);
@@ -13,6 +12,8 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
   // New state for the reverb mix slider: 0 = 100% dry, 1 = 100% wet.
   // Defaulting to 0.3 (i.e. 70% dry, 30% wet).
   const [mix, setMix] = useState(0.3);
+  // New state for pitch control (playback rate). Default is 1 (normal speed).
+  const [pitch, setPitch] = useState(1);
 
   // Create a gain node for channel volume (before effect splitting)
   const gainNode = useRef(audioCtx.createGain());
@@ -35,7 +36,6 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     }
     return impulse;
   }
-
 
   // Pre-load audio sample for Channel 1 from the public directory
   useEffect(() => {
@@ -89,6 +89,13 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     wetGainNode.current.gain.value = mix;
   }, [mix]);
 
+  // Update the playback rate of the current source when pitch changes.
+  useEffect(() => {
+    if (source) {
+      source.playbackRate.value = pitch;
+    }
+  }, [pitch, source]);
+
   // Load an audio sample from a file (triggered by file input)
   const loadSample = (file) => {
     const reader = new FileReader();
@@ -121,6 +128,8 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     const newSource = audioCtx.createBufferSource();
     newSource.buffer = buffer;
     newSource.loop = loop;
+    // Set playback rate based on pitch control
+    newSource.playbackRate.value = pitch;
     // Connect the source to the channel gain node (which splits into dry/wet)
     newSource.connect(gainNode.current);
     const offset = pauseTime || 0;
@@ -161,8 +170,10 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
           }
         }}
       />
-       <div className="playControl">
-        <button type="button" onClick={playSample}>PLAY</button>
+      <div className="playControl">
+        <button type="button" onClick={playSample} className={isPlaying ? 'active' : ''}>
+          PLAY
+        </button>
         <button type="button" onClick={pauseSample}>STOP</button>
       </div>
       <label>
@@ -179,6 +190,20 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         Loop
       </label>
       <br />
+      {/* Pitch control slider: left is slowest, right is fastest */}
+      <div className="pitchSlider">
+        <span>1/2</span>
+        <input
+          type="range"
+          min="0.5"
+          max="2"
+          step="0.01"
+          value={pitch}
+          onChange={(e) => setPitch(parseFloat(e.target.value))}
+          style={{ flexGrow: 1 }}
+        />
+        <span style={{ marginLeft: '8px' }}>2x</span>
+      </div>
       {/* Combined reverb mix slider: horizontal, with "Dry" label on the left and "Wet" on the right */}
       <div className="reverbSlider">
         <span>Dry</span>

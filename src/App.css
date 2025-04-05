@@ -53,10 +53,9 @@ input[type="checkbox"] {
   align-self: center;
 }
 
-.reverbSlider {
+.reverbSlider,
+.pitchSlider {
   display: flex;
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
   align-items: center;
   flex-direction: row;; 
   margin-bottom: 8px;
@@ -72,4 +71,8 @@ button {
   height: 35px;
   width: 100%;
   font-family: monospace;
+}
+
+.active {
+  background-color: lightgreen;
 }
