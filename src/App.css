@@ -1,6 +1,5 @@
 body {
   font-family: monospace;
-  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,4 +73,10 @@ button {
 
 .active {
   background-color: lightgreen;
+}
+
+.tape, 
+.reverb {
+  width: 50px;
+  align-self: center;
 }

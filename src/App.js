@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import tape from './images/tape.png';
+import reverb from './images/reverb.png';
 import './App.css';
 
 function Channel({ index, gain, onGainChange, audioCtx }) {
@@ -191,6 +193,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
       </label>
       <br />
       {/* Pitch control slider: left is slowest, right is fastest */}
+      <img  src={tape} className="tape" alt="Tape Reel"/>
       <div className="pitchSlider">
         <span>1/2</span>
         <input
@@ -205,6 +208,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         <span style={{ marginLeft: '8px' }}>2x</span>
       </div>
       {/* Combined reverb mix slider: horizontal, with "Dry" label on the left and "Wet" on the right */}
+      <img  src={reverb} className="reverb" alt="Reverb"/>
       <div className="reverbSlider">
         <span>Dry</span>
         <input
