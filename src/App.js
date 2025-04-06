@@ -200,7 +200,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
           type="range"
           min="0.5"
           max="2"
-          step="0.01"
+          step="0.5"
           value={pitch}
           onChange={(e) => setPitch(parseFloat(e.target.value))}
           style={{ flexGrow: 1 }}
