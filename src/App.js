@@ -12,6 +12,8 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
   const [loop, setLoop] = useState(false);
   const [mix, setMix] = useState(0.3); // reverb mix: 0 = 100% dry, 1 = 100% wet
   const [pitch, setPitch] = useState(1);
+  const [randomActive, setRandomActive] = useState(false);
+  const randomIntervalRef = useRef(null);
 
   // Create audio nodes for this channel.
   const gainNode = useRef(audioCtx.createGain());
@@ -128,9 +130,21 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     setSource(newSource);
     setIsPlaying(true);
     setPauseTime(0);
+    // Ensure random mode is off when starting playback.
+    if (randomIntervalRef.current) {
+      clearInterval(randomIntervalRef.current);
+      randomIntervalRef.current = null;
+      setRandomActive(false);
+    }
     newSource.onended = () => {
       setIsPlaying(false);
       setPauseTime(0);
+      // Deactivate random mode when audio stops.
+      if (randomIntervalRef.current) {
+        clearInterval(randomIntervalRef.current);
+        randomIntervalRef.current = null;
+        setRandomActive(false);
+      }
     };
   };
 
@@ -144,6 +158,32 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
       }
       setPauseTime(audioCtx.currentTime - startTime);
       setIsPlaying(false);
+      // Deactivate random mode on pause.
+      if (randomIntervalRef.current) {
+        clearInterval(randomIntervalRef.current);
+        randomIntervalRef.current = null;
+        setRandomActive(false);
+      }
+    }
+  };
+
+  // Toggle random pitch modulation.
+  const toggleRandom = () => {
+    if (!isPlaying) return; // Only work while audio is playing.
+    if (randomActive) {
+      // Deactivate random mode.
+      clearInterval(randomIntervalRef.current);
+      randomIntervalRef.current = null;
+      setRandomActive(false);
+    } else {
+      // Activate random mode.
+      setRandomActive(true);
+      randomIntervalRef.current = setInterval(() => {
+        // Randomly pick one of the allowed values (0.5, 1, 1.5, or 2).
+        const steps = [0.5, 1, 1.5, 2];
+        const randomPitch = steps[Math.floor(Math.random() * steps.length)];
+        setPitch(randomPitch);
+      }, 75); // Update every 100ms.
     }
   };
 
@@ -165,6 +205,9 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
           PLAY
         </button>
         <button type="button" onClick={pauseSample}>STOP</button>
+        <button type="button" onClick={toggleRandom} className={randomActive ? 'active' : ''}>
+          GLITCH
+        </button>
       </div>
       <label>
         <input
