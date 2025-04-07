@@ -14,6 +14,8 @@ Each channel has pitch control ranging from 1/2 speed to 2x (1/2x increments).
 
 Each channel has a reverb effect. 
 
+Each channel has glitch mode. When active, the playback speed will randomize every 75ms.
+
 Try making the effect fully wet and setting the playback speed to 1/2x to get a classic ambient vibe.
 
 ![Mixer Screenshot](./src/images/mixer2.png)
