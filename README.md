@@ -1,6 +1,6 @@
-# What is this?
+# Web Audio API Mixer
 
-Demo audio mixer using Web Audio API / Web MIDI API.
+[Demo audio mixer](https://jmelvnsn.github.io/audio-mixer/) using Web Audio API / Web MIDI API.
 
 Channels 1-4 gain are mapped to MIDI CC messages 1-4.
 
@@ -10,4 +10,4 @@ Each channel has pitch control ranging from 1/2 speed to 2x (1/2x increments).
 
 Each channel has a reverb effect. Try making the effect fully wet and setting the playback speed to 1/2x to get a classic ambient vibe.
 
-![Mixer Screenshot](./src/images/mixer.png)
+![Mixer Screenshot](./src/images/mixer2.png)
