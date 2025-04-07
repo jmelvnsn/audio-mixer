@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import tape from './images/tape.png';
+import tape from './images/reel.png';
 import reverb from './images/reverb.png';
 import './App.css';
 
@@ -10,21 +10,16 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
   const [startTime, setStartTime] = useState(0);
   const [pauseTime, setPauseTime] = useState(0);
   const [loop, setLoop] = useState(false);
-  
-  // New state for the reverb mix slider: 0 = 100% dry, 1 = 100% wet.
-  // Defaulting to 0.3 (i.e. 70% dry, 30% wet).
-  const [mix, setMix] = useState(0.3);
-  // New state for pitch control (playback rate). Default is 1 (normal speed).
+  const [mix, setMix] = useState(0.3); // reverb mix: 0 = 100% dry, 1 = 100% wet
   const [pitch, setPitch] = useState(1);
 
-  // Create a gain node for channel volume (before effect splitting)
+  // Create audio nodes for this channel.
   const gainNode = useRef(audioCtx.createGain());
-  // Create nodes for the reverb effect chain
   const dryGainNode = useRef(audioCtx.createGain());
   const wetGainNode = useRef(audioCtx.createGain());
   const convolver = useRef(audioCtx.createConvolver());
 
-  // Helper function to create an impulse response for the convolver
+  // Helper: create impulse response for reverb.
   function createImpulseResponse(duration = 3, decay = 2, reverse = false) {
     const sampleRate = audioCtx.sampleRate;
     const length = sampleRate * duration;
@@ -39,7 +34,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     return impulse;
   }
 
-  // Pre-load audio sample for Channel 1 from the public directory
+  // Pre-load a sample for channel 1.
   useEffect(() => {
     if (index === 0) {
       fetch('https://jmelvnsn.github.io/audio-mixer/acoustic_guitar.wav')
@@ -53,52 +48,47 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     }
   }, [audioCtx, index]);
 
-  // On mount: set up the reverb chain and initialize gains based on the mix value.
+  // Set up audio routing for reverb and connect directly to the destination.
   useEffect(() => {
-    // Set the channel volume gain
+    // Set the channel volume gain.
     gainNode.current.gain.value = gain;
-    // Set impulse response for the convolver
+    // Configure the reverb chain.
     convolver.current.buffer = createImpulseResponse(3, 2, false);
-    // Initialize dry and wet gains based on the mix slider:
-    // mix = 0 => dry 1, wet 0; mix = 1 => dry 0, wet 1.
     dryGainNode.current.gain.value = 1 - mix;
     wetGainNode.current.gain.value = mix;
 
-    // Set up the audio routing:
-    // Source -> gainNode -> splits into two branches:
-    //   Dry: gainNode -> dryGainNode -> destination
-    //   Wet: gainNode -> convolver -> wetGainNode -> destination
     try {
       gainNode.current.disconnect();
     } catch (e) {
       console.error(e);
     }
+    // Route: source -> gainNode -> splits into dry and wet branches -> destination.
     gainNode.current.connect(dryGainNode.current);
     gainNode.current.connect(convolver.current);
     dryGainNode.current.connect(audioCtx.destination);
     convolver.current.connect(wetGainNode.current);
     wetGainNode.current.connect(audioCtx.destination);
-  }, [audioCtx]);
+  }, [audioCtx, mix]);
 
-  // Update the main channel gain if the prop changes.
+  // Update channel gain if prop changes.
   useEffect(() => {
     gainNode.current.gain.value = gain;
   }, [gain]);
 
-  // Update the reverb mix whenever the mix state changes.
+  // Update reverb mix.
   useEffect(() => {
     dryGainNode.current.gain.value = 1 - mix;
     wetGainNode.current.gain.value = mix;
   }, [mix]);
 
-  // Update the playback rate of the current source when pitch changes.
+  // Update playback rate when pitch changes.
   useEffect(() => {
     if (source) {
       source.playbackRate.value = pitch;
     }
   }, [pitch, source]);
 
-  // Load an audio sample from a file (triggered by file input)
+  // Load an audio sample from a file.
   const loadSample = (file) => {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -113,13 +103,13 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     reader.readAsArrayBuffer(file);
   };
 
-  // Play the loaded sample
+  // Play the loaded sample.
   const playSample = () => {
     if (!buffer) {
       alert(`No sample loaded for channel ${index + 1}`);
       return;
     }
-    // Stop current source if playing
+    // Stop current source if playing.
     if (isPlaying && source) {
       try {
         source.stop();
@@ -130,9 +120,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     const newSource = audioCtx.createBufferSource();
     newSource.buffer = buffer;
     newSource.loop = loop;
-    // Set playback rate based on pitch control
     newSource.playbackRate.value = pitch;
-    // Connect the source to the channel gain node (which splits into dry/wet)
     newSource.connect(gainNode.current);
     const offset = pauseTime || 0;
     newSource.start(0, offset);
@@ -146,7 +134,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
     };
   };
 
-  // Pause playback and store the current offset for resuming later
+  // Pause playback.
   const pauseSample = () => {
     if (isPlaying && source) {
       try {
@@ -192,8 +180,12 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         Loop
       </label>
       <br />
-      {/* Pitch control slider: left is slowest, right is fastest */}
-      <img  src={tape} className="tape" alt="Tape Reel"/>
+      {/* Tape image with rotation when playing */}
+      <img
+        src={tape}
+        className={`tape ${isPlaying ? 'rotating' : ''}`}
+        alt="Tape Reel"
+      />
       <div className="pitchSlider">
         <span>1/2</span>
         <input
@@ -207,8 +199,8 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         />
         <span style={{ marginLeft: '8px' }}>2x</span>
       </div>
-      {/* Combined reverb mix slider: horizontal, with "Dry" label on the left and "Wet" on the right */}
-      <img  src={reverb} className="reverb" alt="Reverb"/>
+      {/* Reverb mix slider */}
+      <img src={reverb} className="reverb" alt="Reverb" />
       <div className="reverbSlider">
         <span>Dry</span>
         <input
@@ -222,7 +214,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         />
         <span style={{ marginLeft: '8px' }}>Wet</span>
       </div>
-      {/* Vertical gain slider for channel volume */}
+      {/* Channel gain slider */}
       <label className="gain">
         <input
           type="range"
@@ -242,7 +234,7 @@ function App() {
   const [gains, setGains] = useState([1, 1, 1, 1]);
   const audioCtx = useRef(new (window.AudioContext || window.webkitAudioContext)());
 
-  // Set up MIDI access to update gain values via MIDI Control Change messages
+  // Set up MIDI access to update gain values via MIDI Control Change messages.
   useEffect(() => {
     if (navigator.requestMIDIAccess) {
       navigator.requestMIDIAccess().then(
@@ -260,25 +252,23 @@ function App() {
     }
   }, []);
 
-  // MIDI handler: map CC messages (channels 0-3) to gain updates
+  // MIDI handler: map CC messages (channels 0-3) to gain updates.
   const handleMIDIMessage = (event) => {
     const data = event.data;
     const status = data[0];
     const ccNumber = data[1];
     const value = data[2];
-    if (status >= 176 && status <= 191) {
-      if (ccNumber >= 0 && ccNumber < 4) {
-        const newGain = value / 127;
-        setGains((prevGains) => {
-          const updated = [...prevGains];
-          updated[ccNumber] = newGain;
-          return updated;
-        });
-      }
+    if (status >= 176 && status <= 191 && ccNumber < 4) {
+      const newGain = value / 127;
+      setGains((prevGains) => {
+        const updated = [...prevGains];
+        updated[ccNumber] = newGain;
+        return updated;
+      });
     }
   };
 
-  // Handle slider changes from each channel
+  // Handle slider changes from each channel.
   const handleGainChange = (index, value) => {
     setGains((prevGains) => {
       const newGains = [...prevGains];
