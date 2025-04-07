@@ -1,6 +1,6 @@
 # What is this?
 
-Demo audio mixer using Web Audio API anbd Web MIDI Api.
+Demo audio mixer using Web Audio API / Web MIDI API.
 
 Channels 1-4 gain are mapped to MIDI CC messages 1-4.
 
