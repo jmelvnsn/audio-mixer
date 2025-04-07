@@ -18,4 +18,4 @@ Each channel has glitch mode. When active, the playback speed will randomize eve
 
 Try making the effect fully wet and setting the playback speed to 1/2x to get a classic ambient vibe.
 
-![Mixer Screenshot](./src/images/mixer2.png)
+![Mixer Screenshot](./src/images/mixer3.png)
