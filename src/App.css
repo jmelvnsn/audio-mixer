@@ -25,6 +25,10 @@ body {
   margin-top: 0;
 }
 
+.glitch {
+  display: none;
+}
+
 label {
   margin-right: 10px;
 }

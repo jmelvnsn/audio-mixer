@@ -183,7 +183,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
         const steps = [0.5, 1, 1.5, 2];
         const randomPitch = steps[Math.floor(Math.random() * steps.length)];
         setPitch(randomPitch);
-      }, 75); // Update every 100ms.
+      }, 200); // Update every 200ms.
     }
   };
 
@@ -205,7 +205,7 @@ function Channel({ index, gain, onGainChange, audioCtx }) {
           PLAY
         </button>
         <button type="button" onClick={pauseSample}>STOP</button>
-        <button type="button" onClick={toggleRandom} className={randomActive ? 'active' : ''}>
+        <button type="button" onClick={toggleRandom} className="glitch {randomActive ? 'active' : ''}">
           GLITCH
         </button>
       </div>
